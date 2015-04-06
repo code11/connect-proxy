@@ -24,6 +24,16 @@ module.exports = function proxyMiddleware(options) {
       }
     }
 
+    //given the config {route: "/api/resource", target: "http://dest.host.name/api/resource"}
+    // the "http://proxy.name/api/resource?foo=bar" url
+    // will be proxied wrongly to:  http://dest.host.name/api/resource/?foo=bar instead of  http://dest.host.name/api/resource?foo=bar
+    // or GET http://dest.host.name/api/resource will become GET http://dest.host.name/api/resource/
+    // Removing it should be safe the Target decides if it needs a slash or not by using target: "http://dest.host.name/api/resource/".
+    // so both cases are possible
+    if( url.charAt(0) === '/') {
+      url = url.substr(1);
+    }
+
     //options for this request
     var opts = extend({}, options);
     if (url && url.charAt(0) === '?') { // prevent /api/resource/?offset=0
